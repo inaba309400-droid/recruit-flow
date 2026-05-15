@@ -1,4 +1,4 @@
-import { AlertTriangle, Clock } from "lucide-react";
+import Link from "next/link";
 import type { Company } from "@/lib/types";
 import { getNearestDeadline } from "@/lib/dates";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,12 @@ export function getDeadlineAlerts(companies: Company[], limit = 3): DeadlineAler
     .slice(0, limit);
 }
 
+function alertAccent(days: number) {
+  if (days <= 3) return "border-l-red-500";
+  if (days <= 7) return "border-l-amber-400";
+  return "border-l-cyan-500";
+}
+
 type DeadlineBannerProps = {
   alerts: DeadlineAlert[];
 };
@@ -36,44 +42,21 @@ export function DeadlineBanner({ alerts }: DeadlineBannerProps) {
 
   return (
     <section className="space-y-2" aria-label="締切アラート">
-      {alerts.map((alert) => {
-        const isUrgent = alert.days <= 3;
-        return (
-          <div
-            key={alert.companyId}
-            className={cn(
-              "flex items-center gap-3 rounded-xl border px-3 py-2.5",
-              isUrgent
-                ? "border-red-500/40 bg-red-500/10"
-                : "border-cyan-600/30 bg-cyan-600/5"
-            )}
-          >
-            {isUrgent ? (
-              <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
-            ) : (
-              <Clock className="h-4 w-4 shrink-0 text-cyan-500" />
-            )}
-            <div className="min-w-0 flex-1">
-              <p
-                className={cn(
-                  "truncate text-sm font-semibold",
-                  isUrgent ? "text-red-400" : "text-slate-100"
-                )}
-              >
-                {alert.companyName}
-              </p>
-              <p
-                className={cn(
-                  "text-xs",
-                  isUrgent ? "text-red-400/80" : "text-slate-400"
-                )}
-              >
-                {alert.label}
-              </p>
-            </div>
-          </div>
-        );
-      })}
+      {alerts.map((alert) => (
+        <Link
+          key={alert.companyId}
+          href={`/company/${alert.companyId}`}
+          className={cn(
+            "block rounded-2xl border border-white/[0.08] border-l-4 bg-card py-3 pl-3 pr-4 transition-colors hover:bg-slate-700/50",
+            alertAccent(alert.days)
+          )}
+        >
+          <p className="truncate text-sm font-semibold text-slate-100">
+            {alert.companyName}
+          </p>
+          <p className="mt-0.5 text-xs text-slate-400">{alert.label}</p>
+        </Link>
+      ))}
     </section>
   );
 }

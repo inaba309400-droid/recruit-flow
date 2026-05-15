@@ -16,26 +16,28 @@ export default function HomePage() {
     <>
       <main className="min-h-dvh px-4 pb-24 pt-6">
         <header className="mb-6">
-          <p className="text-xs font-medium uppercase tracking-widest text-cyan-600">
+          <p className="text-xs font-medium uppercase tracking-widest text-cyan-500">
             RecruitFlow
           </p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-50">企業一覧</h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-50">
+            企業一覧
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
             {companies.length}社を管理中
           </p>
         </header>
 
         {alerts.length > 0 && (
-          <div className="mb-6">
-            <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <section className="mb-6">
+            <h2 className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
               締切アラート
             </h2>
             <DeadlineBanner alerts={alerts} />
-          </div>
+          </section>
         )}
 
         <section>
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
             すべての企業
           </h2>
           <ul className="space-y-3">

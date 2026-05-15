@@ -9,21 +9,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        accent: {
-          DEFAULT: "#0891b2",
-          foreground: "#ffffff",
-        },
+        surface: "#0f172a",
+        card: "#1e293b",
+        accent: "#06b6d4",
+      },
+      borderRadius: {
+        card: "16px",
       },
       fontFamily: {
-        sans: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "Roboto",
-          "Helvetica Neue",
-          "Arial",
-          "sans-serif",
-        ],
+        sans: ["var(--font-geist-sans)", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "monospace"],
       },
     },
   },

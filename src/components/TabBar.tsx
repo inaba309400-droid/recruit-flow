@@ -18,7 +18,7 @@ const tabs: { id: CompanyTab; label: string }[] = [
 export function TabBar({ active, onChange }: TabBarProps) {
   return (
     <div
-      className="flex rounded-lg border border-slate-800 bg-slate-900 p-1"
+      className="flex gap-1 rounded-2xl border border-white/[0.08] bg-card p-1"
       role="tablist"
     >
       {tabs.map((tab) => (
@@ -29,10 +29,10 @@ export function TabBar({ active, onChange }: TabBarProps) {
           aria-selected={active === tab.id}
           onClick={() => onChange(tab.id)}
           className={cn(
-            "flex-1 rounded-md py-2 text-xs font-medium transition-colors",
+            "flex-1 rounded-xl py-2.5 text-xs font-medium transition-colors",
             active === tab.id
-              ? "bg-cyan-600 text-white shadow-sm"
-              : "text-slate-400 hover:text-slate-200"
+              ? "bg-cyan-500 text-slate-900"
+              : "text-slate-500 hover:text-slate-300"
           )}
         >
           {tab.label}

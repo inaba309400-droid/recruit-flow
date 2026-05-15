@@ -30,7 +30,7 @@ export function CopyButton({ value, label = "コピー", className }: CopyButton
       variant="outline"
       size="sm"
       onClick={handleCopy}
-      className={cn("shrink-0", className)}
+      className={cn("shrink-0 border-white/[0.08]", className)}
       aria-label={`${label}をクリップボードにコピー`}
     >
       {copied ? (

@@ -69,7 +69,13 @@ export const mockCompanies: Company[] = [
           "Deloitteのグローバルネットワークと多様性を活かしたプロジェクト参加機会に惹かれ志望しました。",
       },
     ],
-    interviewLogs: [],
+    interviewLogs: [
+      {
+        question: "志望動機を30秒で",
+        answer: "グローバルファームで多様な課題に挑戦したいと考え志望しました。",
+        recordedAt: daysAgo(5) + "T10:00:00",
+      },
+    ],
     timeline: [
       { event: "ES提出", date: daysAgo(18), type: "pass" },
       { event: "書類通過", date: daysAgo(10), type: "pass" },
