@@ -8,11 +8,12 @@ import {
   FileText,
   Home,
   Mic,
+  Settings2,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type BottomNavVariant = "home" | "company" | "interview" | "master";
+export type BottomNavVariant = "home" | "company" | "interview" | "master" | "settings";
 
 type NavItem = {
   href: string;
@@ -28,11 +29,14 @@ type BottomNavProps = {
 export function BottomNav({ variant, companyId }: BottomNavProps) {
   const pathname = usePathname();
 
+  const mainNav: NavItem[] = [
+    { href: "/", label: "ホーム", Icon: Home },
+    { href: "/master", label: "マスターES", Icon: FileText },
+    { href: "/settings", label: "設定", Icon: Settings2 },
+  ];
+
   const items: Record<BottomNavVariant, NavItem[]> = {
-    home: [
-      { href: "/", label: "ホーム", Icon: Home },
-      { href: "/master", label: "マスターES", Icon: FileText },
-    ],
+    home: mainNav,
     company: [
       { href: "/", label: "戻る", Icon: ArrowLeft },
       {
@@ -49,10 +53,8 @@ export function BottomNav({ variant, companyId }: BottomNavProps) {
       },
       { href: "#", label: "書き出す", Icon: Download },
     ],
-    master: [
-      { href: "/", label: "ホーム", Icon: Home },
-      { href: "/master", label: "マスターES", Icon: FileText },
-    ],
+    master: mainNav,
+    settings: mainNav,
   };
 
   const navItems = items[variant];
