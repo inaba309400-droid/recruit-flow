@@ -1,7 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
+import { ThemeInitializer } from "@/components/ThemeInitializer";
 import "./globals.css";
+
+// Runs before React hydration to prevent theme flash
+const themeScript = `(function(){try{var s=localStorage.getItem('recruit-flow-storage');var d=JSON.parse(s);var m=d&&d.state&&d.state.themeMode;document.documentElement.classList.toggle('dark',m!=='light')}catch(e){document.documentElement.classList.add('dark')}})()`;
+
 
 export const metadata: Metadata = {
   title: "RecruitFlow — 就活一元管理",
@@ -42,8 +47,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html
+      lang="ja"
+      suppressHydrationWarning
+      className={`${GeistSans.variable} ${GeistMono.variable}`}
+    >
+      <head>
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="font-sans antialiased">
+        <ThemeInitializer />
         <div className="mx-auto min-h-dvh w-full max-w-[390px] bg-surface">
           {children}
         </div>

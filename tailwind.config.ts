@@ -6,11 +6,12 @@ const config: Config = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        surface: "#0f172a",
-        card: "#1e293b",
+        surface: "var(--color-surface)",
+        card: "var(--color-card)",
         accent: "#06b6d4",
       },
       borderRadius: {

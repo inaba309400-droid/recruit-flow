@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { Moon, Plus, Sun } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { CompanyCardCompact } from "@/components/CompanyCard";
 import {
@@ -34,6 +36,8 @@ function sortCompanies(companies: Company[], key: SortKey): Company[] {
 
 export default function HomePage() {
   const companies = useRecruitStore((s) => s.companies);
+  const themeMode = useRecruitStore((s) => s.themeMode);
+  const setThemeMode = useRecruitStore((s) => s.setThemeMode);
   const alerts = getDeadlineAlerts(companies, 3);
   const [sortKey, setSortKey] = useState<SortKey>("更新順");
 
@@ -47,17 +51,40 @@ export default function HomePage() {
 
   return (
     <>
-      <main className="min-h-dvh px-4 pb-24 pt-6">
-        <header className="mb-5">
-          <p className="text-xs font-medium uppercase tracking-widest text-cyan-500">
-            RecruitFlow
-          </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-50">
-            企業一覧
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            {companies.length}社を管理中
-          </p>
+      {/* FAB */}
+      <Link
+        href="/company/new"
+        aria-label="企業を追加"
+        className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-cyan-500 shadow-lg transition-transform active:scale-95"
+      >
+        <Plus className="h-6 w-6 text-slate-900" />
+      </Link>
+
+      <main className="min-h-dvh px-4 pb-28 pt-6">
+        <header className="mb-5 flex items-start justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-widest text-cyan-500">
+              RecruitFlow
+            </p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+              企業一覧
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              {companies.length}社を管理中
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setThemeMode(themeMode === "dark" ? "light" : "dark")}
+            className="mt-1 rounded-full border border-slate-200 bg-card p-2.5 text-slate-600 dark:border-white/[0.08] dark:text-slate-400"
+            aria-label="テーマ切替"
+          >
+            {themeMode === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+          </button>
         </header>
 
         {/* Sort buttons */}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ExternalLink, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { Edit, ExternalLink, Eye, EyeOff } from "lucide-react";
 import type { Company } from "@/lib/types";
 import { CopyButton } from "@/components/CopyButton";
 import { Card } from "@/components/ui/card";
@@ -26,11 +27,11 @@ function InfoRow({
 
   return (
     <Card>
-      <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-slate-500">
+      <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-500">
         {label}
       </p>
       <div className="flex items-center gap-2">
-        <p className="min-w-0 flex-1 break-all text-sm text-slate-100">
+        <p className="min-w-0 flex-1 break-all text-sm text-slate-900 dark:text-slate-100">
           {displayValue}
         </p>
         {masked && (
@@ -52,8 +53,17 @@ function InfoRow({
 export function BasicInfoTab({ company }: BasicInfoTabProps) {
   return (
     <div className="space-y-3">
+      <div className="flex justify-end">
+        <Link
+          href={`/company/${company.id}/edit`}
+          className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-card px-3 py-2 text-xs font-medium text-slate-600 dark:border-white/[0.08] dark:text-slate-400"
+        >
+          <Edit className="h-3.5 w-3.5" />
+          編集
+        </Link>
+      </div>
       <Card>
-        <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-slate-500">
+        <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-500">
           マイページ URL
         </p>
         <div className="flex items-center gap-2">
@@ -61,7 +71,7 @@ export function BasicInfoTab({ company }: BasicInfoTabProps) {
             href={company.mypageUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex min-w-0 flex-1 items-center gap-1 text-sm text-cyan-500 hover:underline"
+            className="flex min-w-0 flex-1 items-center gap-1 text-sm text-cyan-600 dark:text-cyan-500 hover:underline"
           >
             <span className="truncate">{company.mypageUrl}</span>
             <ExternalLink className="h-3.5 w-3.5 shrink-0" />

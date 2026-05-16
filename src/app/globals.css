@@ -3,17 +3,37 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-surface: #f8fafc;
+    --color-card: #ffffff;
+  }
+
+  html.dark {
+    --color-surface: #0f172a;
+    --color-card: #1e293b;
+  }
+
   html {
     -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    @apply bg-surface text-slate-100 antialiased;
+    @apply bg-surface antialiased;
+    color: #0f172a;
+  }
+
+  html.dark body {
+    color: #f1f5f9;
   }
 }
 
 @layer components {
   .card-base {
-    @apply rounded-2xl border border-white/[0.08] bg-card;
+    @apply rounded-2xl bg-card;
+    border: 1px solid rgb(226 232 240);
+  }
+
+  html.dark .card-base {
+    border-color: rgba(255, 255, 255, 0.08);
   }
 }

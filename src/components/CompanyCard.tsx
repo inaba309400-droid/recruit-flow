@@ -16,15 +16,9 @@ export function CompanyCardCompact({ company }: CompanyCardProps) {
   return (
     <Link
       href={`/company/${company.id}`}
-      className="block transition-colors hover:bg-slate-700/60 active:scale-[0.98]"
-      style={{
-        backgroundColor: "#1e293b",
-        borderRadius: 12,
-        padding: 12,
-        border: "1px solid rgba(255,255,255,0.08)",
-      }}
+      className="block rounded-xl border border-slate-200 bg-card p-3 transition-colors hover:bg-slate-100 active:scale-[0.98] dark:border-white/[0.08] dark:hover:bg-slate-700/60"
     >
-      <h2 className="text-[14px] font-semibold leading-snug text-slate-50">
+      <h2 className="text-[14px] font-semibold leading-snug text-slate-900 dark:text-slate-50">
         {company.name}
       </h2>
       <div className="mt-1.5 flex flex-wrap gap-1">
