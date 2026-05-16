@@ -3,6 +3,7 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { ThemeInitializer } from "@/components/ThemeInitializer";
 import { AuthGuard } from "@/components/AuthGuard";
+import { SupabaseSync } from "@/components/SupabaseSync";
 import "./globals.css";
 
 // Runs before React hydration to prevent theme flash
@@ -59,6 +60,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <ThemeInitializer />
+        <SupabaseSync />
         <AuthGuard>
           <div className="mx-auto min-h-dvh w-full max-w-[390px] bg-surface">
             {children}
