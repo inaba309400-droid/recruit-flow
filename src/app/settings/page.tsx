@@ -1,13 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff, Moon, Sun } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, LogOut, Moon, Sun } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { useRecruitStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
   const store = useRecruitStore();
+  const router = useRouter();
+
+  async function handleLogout() {
+    await store.logout();
+    router.replace("/auth");
+  }
 
   return (
     <>
@@ -41,6 +48,7 @@ export default function SettingsPage() {
             setThemeMode={store.setThemeMode}
           />
           <DataSection resetData={store.resetData} />
+          <LogoutSection onLogout={handleLogout} />
         </div>
       </main>
       <BottomNav variant="settings" />
@@ -301,6 +309,40 @@ function DataSection({ resetData }: { resetData: () => void }) {
         <p className="mt-2 text-center text-xs text-slate-500">
           企業データをサンプルデータに戻します
         </p>
+      </div>
+    </Section>
+  );
+}
+
+/* ── Section: ログアウト ──────────────────────── */
+
+function LogoutSection({ onLogout }: { onLogout: () => void }) {
+  const [confirming, setConfirming] = useState(false);
+
+  function handleClick() {
+    if (!confirming) {
+      setConfirming(true);
+      setTimeout(() => setConfirming(false), 3000);
+      return;
+    }
+    onLogout();
+  }
+
+  return (
+    <Section label="アカウント">
+      <div className="px-4 py-3.5">
+        <button
+          onClick={handleClick}
+          className={cn(
+            "flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-colors",
+            confirming
+              ? "bg-red-500 text-white"
+              : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+          )}
+        >
+          <LogOut className="h-4 w-4" />
+          {confirming ? "もう一度タップで確定" : "ログアウト"}
+        </button>
       </div>
     </Section>
   );

@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useRecruitStore } from "@/lib/store";
 
 // Paths that bypass auth check
-const PUBLIC = ["/lock"];
+const PUBLIC = ["/lock", "/auth"];
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const lockEnabled = useRecruitStore((s) => s.lockEnabled);

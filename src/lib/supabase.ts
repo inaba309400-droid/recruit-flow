@@ -27,14 +27,16 @@ export type DbCompany = {
 };
 
 export type DbMasterES = {
-  id: number;
+  id?: number;
+  user_id: string;
   gakuchika: string;
   self_pr: string;
   motivation: string;
 };
 
 export type DbUserSettings = {
-  id: number;
+  id?: number;
+  user_id: string;
   display_name: string;
   default_email: string;
   default_password: string;
@@ -83,8 +85,8 @@ export function fromDbCompany(row: DbCompany): Company {
   };
 }
 
-export function toDbMasterES(m: MasterES) {
-  return { id: 1, gakuchika: m.gakuchika, self_pr: m.selfPR, motivation: m.motivation };
+export function toDbMasterES(m: MasterES, userId: string): Omit<DbMasterES, "id"> {
+  return { user_id: userId, gakuchika: m.gakuchika, self_pr: m.selfPR, motivation: m.motivation };
 }
 
 export function fromDbMasterES(row: DbMasterES): MasterES {
@@ -100,9 +102,9 @@ export type UserSettingsSnapshot = {
   lockPassword: string;
 };
 
-export function toDbUserSettings(s: UserSettingsSnapshot): DbUserSettings {
+export function toDbUserSettings(s: UserSettingsSnapshot, userId: string): Omit<DbUserSettings, "id"> {
   return {
-    id: 1,
+    user_id: userId,
     display_name: s.displayName,
     default_email: s.defaultEmail,
     default_password: s.defaultPassword,

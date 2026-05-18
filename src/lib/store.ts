@@ -24,6 +24,7 @@ type RecruitStore = {
   companies: Company[];
   masterES: MasterES;
   isLoading: boolean;
+  currentUserId: string | null;
   // Theme
   themeMode: "dark" | "light";
   setThemeMode: (mode: "dark" | "light") => void;
@@ -48,6 +49,7 @@ type RecruitStore = {
   resetData: () => void;
   // Supabase
   loadFromSupabase: () => Promise<void>;
+  logout: () => Promise<void>;
 };
 
 // ─── Module-level helpers ───────────────────────────────────────────────────
@@ -63,10 +65,12 @@ function settingsSnapshot(s: RecruitStore): UserSettingsSnapshot {
   };
 }
 
-function pushSettings(snapshot: UserSettingsSnapshot) {
+async function pushSettings(snapshot: UserSettingsSnapshot) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
   supabase
     .from("user_settings")
-    .upsert(toDbUserSettings(snapshot))
+    .upsert(toDbUserSettings(snapshot, user.id), { onConflict: "user_id" })
     .then(({ error }) => { if (error) console.error("[supabase] settings:", error); });
 }
 
@@ -78,6 +82,7 @@ export const useRecruitStore = create<RecruitStore>()(
       companies: mockCompanies,
       masterES: mockMasterES,
       isLoading: false,
+      currentUserId: null,
 
       // Theme
       themeMode: "dark",
@@ -122,10 +127,14 @@ export const useRecruitStore = create<RecruitStore>()(
 
       addCompany: (company) => {
         set((state) => ({ companies: [...state.companies, company] }));
-        supabase
-          .from("companies")
-          .insert(toDbCompany(company))
-          .then(({ error }) => { if (error) console.error("[supabase] addCompany:", error); });
+        void (async () => {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+          supabase
+            .from("companies")
+            .insert({ ...toDbCompany(company), user_id: user.id })
+            .then(({ error }) => { if (error) console.error("[supabase] addCompany:", error); });
+        })();
       },
 
       updateCompany: (id, data) => {
@@ -134,10 +143,14 @@ export const useRecruitStore = create<RecruitStore>()(
         }));
         const company = get().companies.find((c) => c.id === id);
         if (company) {
-          supabase
-            .from("companies")
-            .upsert(toDbCompany(company))
-            .then(({ error }) => { if (error) console.error("[supabase] updateCompany:", error); });
+          void (async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+            supabase
+              .from("companies")
+              .upsert({ ...toDbCompany(company), user_id: user.id })
+              .then(({ error }) => { if (error) console.error("[supabase] updateCompany:", error); });
+          })();
         }
       },
 
@@ -153,8 +166,12 @@ export const useRecruitStore = create<RecruitStore>()(
       resetData: () => {
         set({ companies: mockCompanies });
         void (async () => {
-          await supabase.from("companies").delete().not("id", "is", null);
-          const { error } = await supabase.from("companies").insert(mockCompanies.map(toDbCompany));
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+          await supabase.from("companies").delete().eq("user_id", user.id);
+          const { error } = await supabase
+            .from("companies")
+            .insert(mockCompanies.map((c) => ({ ...toDbCompany(c), user_id: user.id })));
           if (error) console.error("[supabase] resetData:", error);
         })();
       },
@@ -162,12 +179,19 @@ export const useRecruitStore = create<RecruitStore>()(
       // ── Supabase initial load ─────────────────────────────────────────────
 
       loadFromSupabase: async () => {
-        set({ isLoading: true });
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        set({ isLoading: true, currentUserId: user.id });
         try {
           const [companiesRes, masterESRes, settingsRes] = await Promise.all([
-            supabase.from("companies").select("*").order("created_at", { ascending: true }),
-            supabase.from("master_es").select("*").eq("id", 1).maybeSingle(),
-            supabase.from("user_settings").select("*").eq("id", 1).maybeSingle(),
+            supabase
+              .from("companies")
+              .select("*")
+              .eq("user_id", user.id)
+              .order("created_at", { ascending: true }),
+            supabase.from("master_es").select("*").maybeSingle(),
+            supabase.from("user_settings").select("*").maybeSingle(),
           ]);
 
           const patch: Partial<RecruitStore> = { isLoading: false };
@@ -176,10 +200,9 @@ export const useRecruitStore = create<RecruitStore>()(
           if (companiesRes.error) {
             console.error("[supabase] companies fetch:", companiesRes.error);
           } else if ((companiesRes.data as DbCompany[]).length === 0) {
-            // First run: seed with mock data
             const { error } = await supabase
               .from("companies")
-              .insert(mockCompanies.map(toDbCompany));
+              .insert(mockCompanies.map((c) => ({ ...toDbCompany(c), user_id: user.id })));
             if (!error) patch.companies = mockCompanies;
           } else {
             patch.companies = (companiesRes.data as DbCompany[]).map(fromDbCompany);
@@ -189,8 +212,9 @@ export const useRecruitStore = create<RecruitStore>()(
           if (masterESRes.error) {
             console.error("[supabase] master_es fetch:", masterESRes.error);
           } else if (!masterESRes.data) {
-            // First run: seed
-            await supabase.from("master_es").insert(toDbMasterES(get().masterES));
+            await supabase
+              .from("master_es")
+              .insert(toDbMasterES(get().masterES, user.id));
           } else {
             patch.masterES = fromDbMasterES(masterESRes.data as DbMasterES);
           }
@@ -199,10 +223,9 @@ export const useRecruitStore = create<RecruitStore>()(
           if (settingsRes.error) {
             console.error("[supabase] user_settings fetch:", settingsRes.error);
           } else if (!settingsRes.data) {
-            // First run: seed from current local state
             await supabase
               .from("user_settings")
-              .insert(toDbUserSettings(settingsSnapshot(get())));
+              .insert(toDbUserSettings(settingsSnapshot(get()), user.id));
           } else {
             const s = fromDbUserSettings(settingsRes.data as DbUserSettings);
             patch.displayName = s.displayName;
@@ -217,6 +240,25 @@ export const useRecruitStore = create<RecruitStore>()(
         } catch (err) {
           console.error("[supabase] loadFromSupabase:", err);
           set({ isLoading: false });
+        }
+      },
+
+      // ── Logout ───────────────────────────────────────────────────────────
+
+      logout: async () => {
+        await supabase.auth.signOut();
+        set({
+          companies: [],
+          masterES: mockMasterES,
+          currentUserId: null,
+          displayName: "",
+          defaultEmail: "",
+          defaultPassword: "",
+          lockEnabled: false,
+          lockPassword: "",
+        });
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("recruit-flow-storage");
         }
       },
     }),
